@@ -1,9 +1,9 @@
 import WebSocket from 'ws'
+import { FastifyInstance } from 'fastify'
 import { ISocketMessage, ISocketSub } from './types'
 import { pushNotification } from './notification'
-import fastify from 'fastify'
 
-//Messages only last in pubs for 30 mins
+// Messages only last in pubs for 30 mins
 const CLEANUP_INTERVAL = 30 * 60 * 1000
 
 export const subs = new Map<string, ISocketSub[]>()
@@ -89,7 +89,7 @@ const PubController = (socketMessage: ISocketMessage) => {
   }
 }
 
-export default (app: fastify.FastifyInstance, socket: WebSocket, data: WebSocket.Data) => {
+export default (app: FastifyInstance, socket: WebSocket, data: WebSocket.Data) => {
   const message: string = String(data)
 
   if (message) {
@@ -125,7 +125,7 @@ export default (app: fastify.FastifyInstance, socket: WebSocket, data: WebSocket
 export const cleanUpSub = (socket: WebSocket) => {
   for (let topic of subs.keys()) {
     let sub = subs.get(topic)
-    if (sub){
+    if (sub) {
       sub = sub.filter(s => s.socket !== socket)
       subs.set(topic,sub)
       if (sub.length < 1) {
@@ -136,16 +136,16 @@ export const cleanUpSub = (socket: WebSocket) => {
 }
 
 export const cleanUpPub = () => {
-  for (const [topic, pub] of pubs) {
-    if (pub) {
-      while (pub.length != 0) {
-        if (pub[0].time < Date.now() - CLEANUP_INTERVAL) {
-          pub.shift()
+  for (const [topic, messages] of pubs) {
+    if (messages) {
+      while (messages.length > 0) {
+        if (messages[0].time < Date.now() - CLEANUP_INTERVAL) {
+          messages.shift()
         } else {
           break
         }
       }
-      if (pub.length < 1) {
+      if (messages.length <= 0) {
         pubs.delete(topic)
       }
     }
