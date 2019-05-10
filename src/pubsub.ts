@@ -9,7 +9,7 @@ const CLEANUP_INTERVAL = 30 * 60 * 1000
 export const subs = new Map<string, ISocketSub[]>()
 export const pubs = new Map<string, ISocketMessage[]>()
 
-const setSub = function (subscriber: ISocketSub, topic: string){ 
+const setSub = function (subscriber: ISocketSub, topic: string) {
   const sub = subs.get(topic)
   if (!sub) {
     subs.set(topic,[subscriber])
@@ -19,7 +19,7 @@ const setSub = function (subscriber: ISocketSub, topic: string){
   }
 }
 
-const getSub = function (topic: string): ISocketSub[] { 
+const getSub = function (topic: string): ISocketSub[] {
   const sub = subs.get(topic)
   if (sub) {
     return sub
@@ -27,17 +27,17 @@ const getSub = function (topic: string): ISocketSub[] {
   return []
 }
 
-const setPub = function (socketMessage: ISocketMessage, topic: string) { 
+const setPub = function (socketMessage: ISocketMessage, topic: string) {
   const pub = pubs.get(topic)
   if (!pub) {
     pubs.set(topic,[socketMessage])
   } else {
     pub.push(socketMessage)
     pubs.set(topic,pub)
-  } 
+  }
 }
 
-const getPub = function (topic: string): ISocketMessage[] { 
+const getPub = function (topic: string): ISocketMessage[] {
   const pub = pubs.get(topic)
   if (pub) {
     return pub
@@ -49,16 +49,18 @@ function socketSend (socket: WebSocket, socketMessage: ISocketMessage) {
   if (socket.readyState === 1) {
     console.log('OUT =>', socketMessage)
     socket.send(JSON.stringify(socketMessage))
+  } else {
+    setPub(socketMessage, socketMessage.topic)
   }
 }
 
-const delPub = function (topic: string) { 
+const delPub = function (topic: string) {
   pubs.delete(topic)
 }
 
 const SubController = (socket: WebSocket, socketMessage: ISocketMessage) => {
   const topic = socketMessage.topic
-  let time = Date.now() 
+  let time = Date.now()
 
   const subscriber = { topic, socket, time }
 
