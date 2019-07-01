@@ -19,7 +19,7 @@ const setSub = function (subscriber: ISocketSub, topic: string) {
   }
 }
 
-const getSub = function (topic: string): ISocketSub[] {
+export const getSub = function (topic: string): ISocketSub[] {
   const sub = subs.get(topic)
   if (sub) {
     return sub
@@ -106,7 +106,7 @@ export default (app: FastifyInstance, socket: WebSocket, data: WebSocket.Data) =
         socketMessage = JSON.parse(message)
 
         console.log('IN  =>', socketMessage)
-
+        
         switch (socketMessage.type) {
           case 'sub':
             SubController(socket, socketMessage)
