@@ -5,7 +5,7 @@ import fastify from 'fastify'
 import Helmet from 'fastify-helmet'
 import WebSocket from 'ws'
 import config from './config'
-import pubsub, { cleanUpSub, cleanUpPub, subs, pubs } from './pubsub'
+import pubsub, { cleanUpSub, cleanUpPub, subs, pubs, getSub } from './pubsub'
 import { setNotification } from './notification'
 
 import pkg from '../package.json'
@@ -50,6 +50,19 @@ app.get('/info', (_, res) => {
     description: pkg.description,
     version: pkg.version
   })
+})
+
+app.get('/checkTopic', (req, res) => {
+  const topic = req.query.topic
+  if(!topic){
+    res.status(400).send({
+      message: 'Error: Invalid topic'
+    })
+  }
+
+  let subscribers = getSub(topic)
+  subscribers = subscribers.filter(sub=>sub.socket && sub.socket.readyState === 1)
+  res.status(200).send({ isAlive: subscribers.length >= 1 })
 })
 
 app.post('/subscribe', (req, res) => {
