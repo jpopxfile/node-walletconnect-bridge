@@ -2,6 +2,7 @@ import { inspect } from 'util'
 import { IncomingMessage, OutgoingMessage } from 'http'
 
 import fastify from 'fastify'
+import fastifyCors from 'fastify-cors'
 import Helmet from 'fastify-helmet'
 import WebSocket from 'ws'
 import config from './config'
@@ -12,6 +13,15 @@ import pkg from '../package.json'
 
 const CLIENT_PING_INTERVAL = 30 * 1000
 const LOGGING_INTERVAL = 30 * 60 * 1000
+
+const ALLOWORIGINS = [
+  "https://www.binance.org", 
+  "https://testnet.binance.org",
+  "trustwalletapp.com",
+  "trustwallet.com"
+ ]
+ 
+const ALLOWMETHODS = ["GET", "HEADER", "POST", "OPTIONS"]
 
 const noop = () => {}
 
@@ -34,6 +44,11 @@ const app = fastify({
 })
 
 app.register(Helmet)
+
+app.register(fastifyCors, {
+  origin: ALLOWORIGINS,
+  methods: ALLOWMETHODS
+})
 
 // for container health checks
 app.get('/health', (_, res) => {
