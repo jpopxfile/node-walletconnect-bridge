@@ -17,11 +17,11 @@ const LOGGING_INTERVAL = 30 * 60 * 1000
 const ALLOWORIGINS = [
   "https://www.binance.org", 
   "https://testnet.binance.org",
-  "trustwalletapp.com",
-  "trustwallet.com"
+  "https://trustwalletapp.com",
+  "https://trustwallet.com"
  ]
- 
-const ALLOWMETHODS = ["GET", "HEADER", "POST", "OPTIONS"]
+
+const ALLOWMETHODS = ["GET", "POST", "OPTIONS"]
 
 const noop = () => {}
 
