@@ -18,7 +18,8 @@ const ALLOWORIGINS = [
   "https://www.binance.org", 
   "https://testnet.binance.org",
   "https://trustwalletapp.com",
-  "https://trustwallet.com"
+  "https://trustwallet.com",
+  "https://local.binance.org:3000"
  ]
 
 const ALLOWMETHODS = ["GET", "HEAD", "POST", "OPTIONS"]
