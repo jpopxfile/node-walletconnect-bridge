@@ -21,7 +21,7 @@ const ALLOWORIGINS = [
   "https://trustwallet.com"
  ]
 
-const ALLOWMETHODS = ["GET", "POST", "OPTIONS"]
+const ALLOWMETHODS = ["GET", "HEAD", "POST", "OPTIONS"]
 
 const noop = () => {}
 
