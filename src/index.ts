@@ -2,16 +2,27 @@ import { inspect } from 'util'
 import { IncomingMessage, OutgoingMessage } from 'http'
 
 import fastify from 'fastify'
+import fastifyCors from 'fastify-cors'
 import Helmet from 'fastify-helmet'
 import WebSocket from 'ws'
 import config from './config'
-import pubsub, { cleanUpSub, cleanUpPub, subs, pubs } from './pubsub'
+import pubsub, { cleanUpSub, cleanUpPub, subs, pubs, getSub } from './pubsub'
 import { setNotification } from './notification'
 
 import pkg from '../package.json'
 
 const CLIENT_PING_INTERVAL = 30 * 1000
 const LOGGING_INTERVAL = 30 * 60 * 1000
+
+const ALLOWORIGINS = [
+  "https://www.binance.org", 
+  "https://testnet.binance.org",
+  "https://trustwalletapp.com",
+  "https://trustwallet.com",
+  "https://local.binance.org:3000"
+ ]
+
+const ALLOWMETHODS = ["GET", "HEAD", "POST", "OPTIONS"]
 
 const noop = () => {}
 
@@ -35,6 +46,11 @@ const app = fastify({
 
 app.register(Helmet)
 
+app.register(fastifyCors, {
+  origin: ALLOWORIGINS,
+  methods: ALLOWMETHODS
+})
+
 // for container health checks
 app.get('/health', (_, res) => {
   res.status(204).send()
@@ -50,6 +66,19 @@ app.get('/info', (_, res) => {
     description: pkg.description,
     version: pkg.version
   })
+})
+
+app.get('/checkTopic', (req, res) => {
+  const topic = req.query.topic
+  if(!topic){
+    res.status(400).send({
+      message: 'Error: Invalid topic'
+    })
+  }
+
+  let subscribers = getSub(topic)
+  subscribers = subscribers.filter(sub=>sub.socket && sub.socket.readyState === 1)
+  res.status(200).send({ isAlive: subscribers.length >= 1 })
 })
 
 app.post('/subscribe', (req, res) => {
